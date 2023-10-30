@@ -4,12 +4,15 @@ import {
   SearchForm,
   SearchFormButton,
   SearchFormInput,
-//   SearchFormLabel,
+  //   SearchFormLabel,
 } from './search-bar.styled';
 
 import { BiSearchAlt } from 'react-icons/bi';
+import { fetchImages } from 'api';
 
-// onSearch = () => {}
+const searchImages = () => {
+  fetchImages();
+};
 
 export const SearchBar = () => {
   return (
@@ -22,9 +25,9 @@ export const SearchBar = () => {
         }}
       >
         <SearchForm>
-          <SearchFormButton type="submit">
+          <SearchFormButton onClick={() => searchImages}>
             {/* <SearchFormLabel> */}
-              <BiSearchAlt size={32}/>
+            <BiSearchAlt size={32} />
             {/* </SearchFormLabel> */}
           </SearchFormButton>
 
