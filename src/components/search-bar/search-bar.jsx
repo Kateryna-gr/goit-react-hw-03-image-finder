@@ -4,33 +4,22 @@ import {
   SearchForm,
   SearchFormButton,
   SearchFormInput,
-  //   SearchFormLabel,
 } from './search-bar.styled';
-
 import { BiSearchAlt } from 'react-icons/bi';
-import { fetchImages } from 'api';
 
-const searchImages = () => {
-  fetchImages();
-};
-
-export const SearchBar = () => {
+export const SearchBar = ({ searchImages }) => {
   return (
     <HeaderSearch>
       <Formik
-        initialValues={{ input: 'Search images and photos' }}
-        onSubmit={(values, actions) => {
-          this.onSearch(values);
-          actions.resetForm();
+        initialValues={{ input: '' }}
+        onSubmit={values => {
+          searchImages(values.input);
         }}
       >
         <SearchForm>
-          <SearchFormButton onClick={() => searchImages}>
-            {/* <SearchFormLabel> */}
+          <SearchFormButton type="submit">
             <BiSearchAlt size={32} />
-            {/* </SearchFormLabel> */}
           </SearchFormButton>
-
           <SearchFormInput
             name="input"
             type="text"
