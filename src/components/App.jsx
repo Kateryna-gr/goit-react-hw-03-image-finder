@@ -12,10 +12,12 @@ export class App extends Component {
     images: [],
     query: '',
     page: 0,
+    perPage: 12,
     isLoading: false,
   };
 
   onInput = value => {
+    console.log(value);
     if (value && this.state.query !== value) {
       this.setState({ query: value });
       this.onSearch();
@@ -23,35 +25,45 @@ export class App extends Component {
   };
 
   async onSearch() {
+    console.log(this.state.query);
     this.setState({ isLoading: true });
     try {
       const response = await fetchImages(this.state.query, 1);
-      this.setState({ images: response, page: 1 });
+      this.setState({ images: response.hits, page: 1 });
+      if (this.state.page > response.totalHits / this.state.perPage + 1) {
+        this.setState({ page: 0 });
+      }
     } catch (error) {
       this.setState({ error, page: 0 });
     } finally {
       this.setState({ isLoading: false });
     }
-    console.log(this.state.images);
+    console.log(this.state);
   }
 
   loadMoreImages = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
-    console.log(this.state.page);
     this.onLoadMore();
   };
 
   async onLoadMore() {
+    this.setState({ isLoading: true });
     try {
       const response = await fetchImages(this.state.query, this.state.page);
       this.setState(prevState => ({
-        images: [...prevState.images, ...response],
+        images: [...prevState.images, ...response.hits],
       }));
+      if (this.state.page > response.totalHits / 12 + 1) {
+        this.setState({ page: 0 });
+      }
     } catch (error) {
       this.setState({ error, page: 0 });
+    } finally {
+      this.setState({ isLoading: false });
     }
+    console.log(this.state);
   }
 
   render() {

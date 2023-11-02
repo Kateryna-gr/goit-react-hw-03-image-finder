@@ -3,13 +3,25 @@ import { ItemImage } from './image-gallery.styled';
 import Modal from 'react-modal';
 
 const customStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(55, 55, 55, 0.75)',
+  },
   content: {
+    maxWidth: '80%',
     top: '50%',
     left: '50%',
     right: 'auto',
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
+    backgroundColor: '#3f51b5',
+    border: 'none',
+    padding: 3,
   },
 };
 
@@ -41,11 +53,7 @@ export class GalleryItemImage extends Component {
           style={customStyles}
           contentLabel="Image Modal"
         >
-          <div className="overlay">
-            <div className="modal">
-              <img src={large} alt={alt} />
-            </div>
-          </div>
+          <img src={large} alt={alt} />
         </Modal>
       </Fragment>
     );
