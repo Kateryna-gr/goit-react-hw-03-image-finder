@@ -16,61 +16,54 @@ export class App extends Component {
     isLoading: false,
   };
 
-  onInput = value => {
-    console.log(value);
-    if (value && this.state.query !== value) {
-      this.setState({ query: value });
-      this.onSearch();
-    }
-  };
-
-  async onSearch() {
-    console.log(this.state.query);
-    this.setState({ isLoading: true });
-    try {
-      const response = await fetchImages(this.state.query, 1);
-      this.setState({ images: response.hits, page: 1 });
-      if (this.state.page > response.totalHits / this.state.perPage + 1) {
-        this.setState({ page: 0 });
-      }
-    } catch (error) {
-      this.setState({ error, page: 0 });
-    } finally {
-      this.setState({ isLoading: false });
-    }
+  componentDidUpdate() {
     console.log(this.state);
   }
+
+  onSearch = value => {
+    this.setState({ images: [] });
+    if (value && this.state.query !== value) {
+      this.setState({ query: value, page: 1 });
+    }
+    this.onSearchImages();
+    // this.onSearch();
+  };
 
   loadMoreImages = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
-    this.onLoadMore();
+    this.onSearchImages();
+    // this.onLoadMore();
   };
 
-  async onLoadMore() {
+  async onSearchImages() {
     this.setState({ isLoading: true });
     try {
       const response = await fetchImages(this.state.query, this.state.page);
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.hits],
-      }));
+
+      if (response.totalHits === 0) {
+        this.setState({ page: 0 });
+        return;
+      }
       if (this.state.page > response.totalHits / 12 + 1) {
         this.setState({ page: 0 });
       }
+      this.setState(prevState => ({
+        images: [...prevState.images, ...response.hits],
+      }));
     } catch (error) {
       this.setState({ error, page: 0 });
     } finally {
       this.setState({ isLoading: false });
     }
-    console.log(this.state);
   }
 
   render() {
     const { images, page, isLoading } = this.state;
     return (
       <Container>
-        <SearchBar searchImages={this.onInput} />
+        <SearchBar searchImages={this.onSearch} />
 
         {images.length ? (
           <ImageGallery images={images} />
@@ -78,8 +71,47 @@ export class App extends Component {
           <NoImages>No images</NoImages>
         )}
         {isLoading && <Loader />}
-        {page > 0 && <Button loadMore={this.loadMoreImages} />}
+        {page > 1 && <Button loadMore={this.loadMoreImages} />}
       </Container>
     );
   }
 }
+
+// async onSearch() {
+//   if (this.state.query === '') return;
+//   console.log(this.state.query);
+//   this.setState({ isLoading: true });
+//   try {
+//     const response = await fetchImages(this.state.query, 1);
+//     this.setState({ images: response.hits, page: 1 });
+//     if (response.totalHits === 0) {
+//       this.setState({ page: 0 });
+//     }
+//     if (this.state.page > response.totalHits / this.state.perPage + 1) {
+//       this.setState({ page: 0 });
+//     }
+//   } catch (error) {
+//     this.setState({ error, page: 0 });
+//   } finally {
+//     this.setState({ isLoading: false });
+//   }
+//   console.log(this.state);
+// }
+
+// async onLoadMore() {
+//   this.setState({ isLoading: true });
+//   try {
+//     const response = await fetchImages(this.state.query, this.state.page);
+//     this.setState(prevState => ({
+//       images: [...prevState.images, ...response.hits],
+//     }));
+//     if (this.state.page > response.totalHits / 12 + 1) {
+//       this.setState({ page: 0 });
+//     }
+//   } catch (error) {
+//     this.setState({ error, page: 0 });
+//   } finally {
+//     this.setState({ isLoading: false });
+//   }
+//   console.log(this.state);
+// }
