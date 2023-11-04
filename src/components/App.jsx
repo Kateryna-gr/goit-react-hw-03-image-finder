@@ -18,44 +18,46 @@ export class App extends Component {
 
   componentDidUpdate() {
     console.log(this.state);
-    // if (this.state.query && this.state.page) {
-    //   this.onSearchImages();
-    // }
+    if (this.state.query && this.state.page) {
+      this.onSearchImages();
+    }
   }
 
   onSearch = value => {
     if (value && this.state.query !== value) {
-      this.setState({ query: value, images: [], page: 1 });
+      this.setState({ query: value, images: [], page: 1, isLoading: true });
     }
-    if (this.state.query && this.state.page) {
-      this.onSearchImages();
-    }
+    // if (this.state.query && this.state.page) {
+    //   this.onSearchImages();
+    // }
   };
 
   loadMoreImages = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
+      isLoading: true,
     }));
-    this.onSearchImages();
+    // this.onSearchImages();
   };
 
   async onSearchImages() {
+    if (!this.state.query || !this.state.page) {
+      return;
+    }
     try {
-      this.setState({ isLoading: true, error: false });
       const response = await fetchImages(this.state.query, this.state.page);
-
+      if (this.state.page > response.totalHits / this.state.perPage + 1) {
+        this.setState({ page: 0 });
+      }
       if (response.totalHits === 0) {
         this.setState({ page: 0 });
-        return;
+      } else {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...response.hits],
+        }));
       }
-      if (this.state.page > response.totalHits / 12 + 1) {
-        this.setState({ page: 0 });
-      }
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.hits],
-      }));
     } catch (error) {
-      this.setState({ error, page: 0 });
+      this.setState({ page: 0 });
     } finally {
       this.setState({ isLoading: false });
     }
@@ -73,7 +75,7 @@ export class App extends Component {
           <NoImages>No images</NoImages>
         )}
         {isLoading && <Loader />}
-        {page > 0 && <Button loadMore={this.loadMoreImages} />}
+        {page > 0 && !isLoading && <Button loadMore={this.loadMoreImages} />}
       </Container>
     );
   }
