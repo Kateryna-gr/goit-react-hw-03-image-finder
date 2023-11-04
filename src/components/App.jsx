@@ -18,15 +18,18 @@ export class App extends Component {
 
   componentDidUpdate() {
     console.log(this.state);
+    // if (this.state.query && this.state.page) {
+    //   this.onSearchImages();
+    // }
   }
 
   onSearch = value => {
-    this.setState({ images: [] });
     if (value && this.state.query !== value) {
-      this.setState({ query: value, page: 1 });
+      this.setState({ query: value, images: [], page: 1 });
     }
-    this.onSearchImages();
-    // this.onSearch();
+    if (this.state.query && this.state.page) {
+      this.onSearchImages();
+    }
   };
 
   loadMoreImages = () => {
@@ -34,12 +37,11 @@ export class App extends Component {
       page: prevState.page + 1,
     }));
     this.onSearchImages();
-    // this.onLoadMore();
   };
 
   async onSearchImages() {
-    this.setState({ isLoading: true });
     try {
+      this.setState({ isLoading: true, error: false });
       const response = await fetchImages(this.state.query, this.state.page);
 
       if (response.totalHits === 0) {
@@ -71,47 +73,8 @@ export class App extends Component {
           <NoImages>No images</NoImages>
         )}
         {isLoading && <Loader />}
-        {page > 1 && <Button loadMore={this.loadMoreImages} />}
+        {page > 0 && <Button loadMore={this.loadMoreImages} />}
       </Container>
     );
   }
 }
-
-// async onSearch() {
-//   if (this.state.query === '') return;
-//   console.log(this.state.query);
-//   this.setState({ isLoading: true });
-//   try {
-//     const response = await fetchImages(this.state.query, 1);
-//     this.setState({ images: response.hits, page: 1 });
-//     if (response.totalHits === 0) {
-//       this.setState({ page: 0 });
-//     }
-//     if (this.state.page > response.totalHits / this.state.perPage + 1) {
-//       this.setState({ page: 0 });
-//     }
-//   } catch (error) {
-//     this.setState({ error, page: 0 });
-//   } finally {
-//     this.setState({ isLoading: false });
-//   }
-//   console.log(this.state);
-// }
-
-// async onLoadMore() {
-//   this.setState({ isLoading: true });
-//   try {
-//     const response = await fetchImages(this.state.query, this.state.page);
-//     this.setState(prevState => ({
-//       images: [...prevState.images, ...response.hits],
-//     }));
-//     if (this.state.page > response.totalHits / 12 + 1) {
-//       this.setState({ page: 0 });
-//     }
-//   } catch (error) {
-//     this.setState({ error, page: 0 });
-//   } finally {
-//     this.setState({ isLoading: false });
-//   }
-//   console.log(this.state);
-// }
