@@ -17,19 +17,13 @@ export class App extends Component {
   };
 
   componentDidUpdate() {
-    console.log(this.state);
-    if (this.state.query && this.state.page) {
-      this.onSearchImages();
-    }
+    this.onSearchImages();
   }
 
   onSearch = value => {
     if (value && this.state.query !== value) {
       this.setState({ query: value, images: [], page: 1, isLoading: true });
     }
-    // if (this.state.query && this.state.page) {
-    //   this.onSearchImages();
-    // }
   };
 
   loadMoreImages = () => {
@@ -37,7 +31,6 @@ export class App extends Component {
       page: prevState.page + 1,
       isLoading: true,
     }));
-    // this.onSearchImages();
   };
 
   async onSearchImages() {
