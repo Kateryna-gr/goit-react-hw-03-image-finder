@@ -16,8 +16,12 @@ export class App extends Component {
     isLoading: false,
   };
 
-  componentDidUpdate() {
-    this.onSearchImages();
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.query !== this.state.query ||
+      prevState.page !== this.state.page
+    )
+      this.onSearchImages();
   }
 
   onSearch = value => {
@@ -39,7 +43,7 @@ export class App extends Component {
     }
     try {
       const response = await fetchImages(this.state.query, this.state.page);
-      if (this.state.page > response.totalHits / this.state.perPage + 1) {
+      if (this.state.page > response.totalHits / this.state.perPage) {
         this.setState({ page: 0 });
       }
       if (response.totalHits === 0) {
